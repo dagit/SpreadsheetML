@@ -8,10 +8,81 @@ import Data.Word ( Word64 )
 
 data Workbook = Workbook
   { workbookDocumentProperties :: Maybe DocumentProperties
+  , workbookStyles             :: Maybe Styles
   , workbookWorksheets         :: [Worksheet]
   }
   deriving (Read, Show)
 
+data Styles = Styles
+  { elemStyles :: [Style]
+  }
+  deriving (Read, Show)
+  
+data Style = Style
+  -- attributes
+  { attribID         :: StyleID
+  , attribName       :: Maybe String
+  , attribParent     :: Maybe String
+  -- elements
+  , elemAlignment    :: Maybe Alignment
+  , elemBorders      :: Maybe Borders
+  , elemFont         :: Maybe Font
+  , elemInterior     :: Maybe Interior
+  , elemNumberFormat :: Maybe NumberFormat
+  , elemProtection   :: Maybe Protection
+  }
+  deriving (Read, Show)
+  
+data Alignment = Alignment
+  { alignHorizontal   :: Maybe Horizontal
+  , alignReadingOrder :: Maybe ReadingOrder
+  , alignRotate       :: Maybe Double
+  , alignShrinkToFit  :: Maybe Bool
+  , alignVertical     :: Maybe Vertical
+  }
+  deriving (Read, Show)
+  
+data Borders = Borders
+  { elemBorder :: [Border] }
+  deriving (Read, Show)
+  
+data Border = Border
+  { attribPosition    :: Maybe Position
+  , attribBorderColor :: Maybe String
+  , attribLineStyle   :: Maybe LineStyle
+  , attribWeight      :: Maybe LineWeight
+  }
+  deriving (Read, Show)
+  
+data Font = Font
+  { attribBold          :: Maybe Bool
+  , attribFontColor     :: Maybe String
+  , attribFontName      :: Maybe String
+  , attribItalic        :: Maybe Bool
+  , attribSize          :: Maybe Double
+  , attribStrikeThrough :: Maybe Bool
+  , attribUnderline     :: Maybe Underline
+  , attribCharSet       :: Maybe Word64
+  , attribFamily        :: Maybe FontFamily
+  }
+  deriving (Read, Show)
+  
+data Interior = Interior
+  { attribInteriorColor :: Maybe String
+  , attribPattern       :: Maybe Pattern
+  }
+  deriving (Read, Show)
+  
+data NumberFormat = NumberFormat
+  { attribFormat :: Maybe String }
+  deriving (Read, Show)
+  
+data Protection = Protection
+  { attribProtected   :: Maybe Bool
+  , attribHideFormula :: Maybe Bool
+  }
+  deriving (Read, Show)
+  
 data DocumentProperties = DocumentProperties
   { documentPropertiesTitle       :: Maybe String
   , documentPropertiesSubject     :: Maybe String
@@ -32,6 +103,7 @@ data Worksheet = Worksheet
 data Table = Table
   { tableColumns             :: [Column]
   , tableRows                :: [Row]
+  , tableStyleID             :: Maybe StyleID -- ^ Must be defined in Styles
   , tableDefaultColumnWidth  :: Maybe Double -- ^ Default is 48
   , tableDefaultRowHeight    :: Maybe Double -- ^ Default is 12.75
   , tableExpandedColumnCount :: Maybe Word64
@@ -45,6 +117,7 @@ data Table = Table
 
 data Column = Column
   { columnCaption      :: Maybe Caption
+  , columnStyleID      :: Maybe StyleID -- ^ Must be defined in Styles
   , columnAutoFitWidth :: Maybe AutoFitWidth
   , columnHidden       :: Maybe Hidden
   , columnIndex        :: Maybe Word64
@@ -55,6 +128,7 @@ data Column = Column
 
 data Row = Row
   { rowCells         :: [Cell]
+  , rowStyleID       :: Maybe StyleID -- ^ Must be defined in Styles
   , rowCaption       :: Maybe Caption
   , rowAutoFitHeight :: Maybe AutoFitHeight
   , rowHeight        :: Maybe Double
@@ -68,6 +142,7 @@ data Cell = Cell
   -- elements
   { cellData          :: Maybe ExcelValue
   -- Attributes
+  , cellStyleID       :: Maybe StyleID -- ^ Must be defined in Styles
   , cellFormula       :: Maybe Formula
   , cellIndex         :: Maybe Word64
   , cellMergeAcross   :: Maybe Word64
@@ -93,10 +168,43 @@ data AutoFitHeight = AutoFitHeight | DoNotAutoFitHeight
 data Hidden = Shown | Hidden
   deriving (Read, Show)
 
+data Horizontal = HAlignAutomatic | HAlignLeft | HAlignCenter | HAlignRight
+  deriving (Read, Show)
+
+data ReadingOrder = RightToLeft | LeftToRight
+  deriving (Read, Show)
+  
+data Vertical = VAlignAutomatic | VAlignTop | VAlignBottom | VAlignCenter
+  deriving (Read, Show)
+  
+data Position = PositionLeft | PositionTop | PositionRight | PositionBottom
+  deriving (Read, Show)
+
+data LineStyle = LineStyleNone | LineStyleContinuous | LineStyleDash | LineStyleDot | LineStyleDashDot | LineStyleDashDotDot
+  deriving (Read, Show)
+
+data LineWeight = Hairline | Thin | Medium | Thick
+  deriving (Read, Show)
+
+data Underline = UnderlineNone | UnderlineSingle | UnderlineDouble | UnderlineSingleAccounting | UnderlineDoubleAccounting
+  deriving (Read, Show)
+
+data FontFamily = Automatic | Decorative | Modern | Roman | Script | Swiss
+  deriving (Read, Show)
+
+data Pattern = PatternNone | PatternSolid | PatternGray75 | PatternGray50 | PatternGray25 | PatternGray125 | PatternGray0625 | 
+               PatternHorzStripe | PatternVertStripe | PatternReverseDiagStripe | PatternDiagStripe | PatternDiagCross | 
+               PatternThickDiagCross | PatternThinHorzStripe | PatternThinVertStripe | PatternThinReverseDiagStripe | 
+               PatternThinDiagStripe | PatternThinHorzCross | PatternThinDiagCross
+  deriving (Read, Show)
+  
 -- | For now this is just a string, but we could model excel's names
 newtype Name = Name String
   deriving (Read, Show)
 
 newtype Caption = Caption String
+  deriving (Read, Show)
+
+newtype StyleID = StyleID String
   deriving (Read, Show)
 

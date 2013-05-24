@@ -4,7 +4,7 @@ import Text.XML.SpreadsheetML.Types
 
 -- | Construct empty values
 emptyWorkbook :: Workbook
-emptyWorkbook = Workbook Nothing []
+emptyWorkbook = Workbook Nothing Nothing []
 
 emptyDocumentProperties :: DocumentProperties
 emptyDocumentProperties =
@@ -15,17 +15,20 @@ emptyWorksheet name = Worksheet Nothing name
 
 emptyTable :: Table
 emptyTable =
-  Table [] [] Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+  Table [] [] Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 emptyColumn :: Column
 emptyColumn =
-  Column Nothing Nothing Nothing Nothing Nothing Nothing
+  Column Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 emptyRow :: Row
-emptyRow = Row [] Nothing Nothing Nothing Nothing Nothing Nothing
+emptyRow = Row [] Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 emptyCell :: Cell
-emptyCell = Cell Nothing Nothing Nothing Nothing Nothing
+emptyCell = Cell Nothing Nothing Nothing Nothing Nothing Nothing
+
+formatCell :: StyleID -> Cell -> Cell
+formatCell s c = c { cellStyleID = Just s }
 
 -- | Convenience constructors
 number :: Double -> Cell
@@ -43,7 +46,16 @@ formula :: String -> Cell
 formula f = emptyCell { cellFormula = Just (Formula f) }
 
 mkWorkbook :: [Worksheet] -> Workbook
-mkWorkbook ws = Workbook Nothing ws
+mkWorkbook ws = Workbook Nothing Nothing ws
+
+mkStyles :: [Style] -> Styles
+mkStyles ss = Styles ss
+
+mkBorders :: [Border] -> Borders
+mkBorders bs = Borders bs
+
+mkStyle :: StyleID -> Style
+mkStyle id = Style id Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 mkWorksheet :: Name -> Table -> Worksheet
 mkWorksheet name table = Worksheet (Just table) name
